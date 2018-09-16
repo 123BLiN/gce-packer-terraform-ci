@@ -2,18 +2,19 @@
     "description": "Create an ubuntu-16.04-lts based nginx image",
     "variables": {
         "project_id": "gce-packer-terraform-ci",
-        "zone": "europe-west3-b"
+        "zone": "{{env `CLOUDSDK_COMPUTE_ZONE`}}",
+        "accout_file_path": "{{env `GOOGLE_APPLICATION_CREDENTIALS`}}"
     },
     "builders": [
         {
             "type": "googlecompute",
-            "project_id": "{{user `project_id`}}",
+            "project_id": "{{usr `project_id`}}",
             "source_image_family": "ubuntu-1604-lts",
-            "zone": "{{user `zone`}}",
+            "zone": "{{usr `zone`}}",
             "ssh_username": "ubuntu",
-            "name": "nginx",
-            "image_name": "ngx-ubuntu-ci",
-            "account_file": "{{ user `service_account_json`}}"
+            "image_family": "nginx-ubuntu",
+            "image_name": "ngx-ubuntu-{{uuid}}",
+            "account_file": "{{user `account_file_path`}}"
         }
     ],
     "provisioners": [

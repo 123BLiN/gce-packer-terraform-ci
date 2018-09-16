@@ -1,13 +1,29 @@
-version: 2
-jobs:
-  build:
-    docker:
-      - image: debian:stretch
-    steps:
-      - checkout
-      - run:
-          name: Greeting
-          command: echo Hello, world.
-      - run:
-          name: Print the Current Time
-          command: date
+machine:
+  environment:
+    GCLOUD_PROJECT: "gce-packer-terraform-ci"
+    CLOUDSDK_COMPUTE_ZONE: "europe-west3-b"
+    CLOUDSDK_COMPUTE_REGION: "us-west1"
+    GOOGLE_APPLICATION_CREDENTIALS: "$HOME/client-secret.json"
+  post:
+    - echo $CLIENT_KEYS | base64 --decode > $GOOGLE_APPLICATION_CREDENTIALS
+
+dependencies:
+  cache_directories:
+    - "~/bin"
+  pre:
+    - mkdir -p ~/packer
+    - wget https://releases.hashicorp.com/packer/1.3.1/packer_1.3.1_linux_amd64.zip
+    - unzip packer_0.12.0_linux_amd64.zip
+    - mv packer ~/bin/packer
+
+test:
+  override:
+    - ~/bin/packer validate ./packer/packer.json
+
+deployment:
+  packer:
+    branch: master 
+    commands:
+      - gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS
+      - gcloud config set project $GCLOUD_PROJECT
+      - ~/bin/packer build ./packer/packer.json
