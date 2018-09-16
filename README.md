@@ -1,6 +1,6 @@
 # gce-packer-terraform
 
-Example repository to deploy instance built with packer using terraform on GCE
+Example repository to deploy instance built with packer using terraform on GCE using CicrleCI
 
 # How to use
 
